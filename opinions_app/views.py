@@ -1,10 +1,10 @@
 from random import randrange
 
-from flask import render_template, url_for, abort, redirect, flash
+from flask import render_template, url_for
 
 from . import app, db
 from .models import Opinion
-from .forms import OpinionForm
+from .forms import FlaskForm
 
 
 @app.route('/')
