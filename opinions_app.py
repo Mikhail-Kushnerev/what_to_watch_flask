@@ -2,6 +2,7 @@ from datetime import datetime
 from random import randrange
 
 from flask import Flask, render_template, redirect, url_for, flash
+from flask_migrate import Migrate
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, TextAreaField, URLField
 from wtforms.validators import DataRequired, Length, Optional
@@ -14,6 +15,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///db.sqlite3"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["SECRET_KEY"] = "MY_SECRET_KEY"
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 
 class Opinion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -21,6 +23,7 @@ class Opinion(db.Model):
     text = db.Column(db.Text, unique=True, nullable=False)
     source = db.Column(db.String(256))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
+    added_by = db.Column(db.String(64))
 
 
 class OpinionForm(FlaskForm):
@@ -45,11 +48,21 @@ class OpinionForm(FlaskForm):
     submit = SubmitField("Добавить")
 
 
+@app.errorhandler(404)
+def oage_nor_found(error):
+    return render_template("404.html"), 404
+
+
+@app.errorhandler(500)
+def oage_nor_found(error):
+    return render_template("500.html"), 500
+
+
 @app.route('/')
 def index_view():
     quantity: int = Opinion.query.count()
     if not quantity:
-        return 'Совсем скоро тут будет случайное мнение о фильме!'
+        abort(404)
     ofsset_value = randrange(quantity)
     opinion = Opinion.query.offset(ofsset_value).first()
     context = {
