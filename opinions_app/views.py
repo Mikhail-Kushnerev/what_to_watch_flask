@@ -1,10 +1,10 @@
 from random import randrange
 
-from flask import render_template, url_for
+from flask import render_template, url_for, redirect, abort, flash
 
 from . import app, db
 from .models import Opinion
-from .forms import FlaskForm
+from .forms import OpinionForm
 
 
 @app.route('/')
@@ -29,7 +29,7 @@ def add_opinion_view():
         if Opinion.query.filter_by(text=text).first():
             flash('Такое мнение уже было оставлено ранее!', 'same-text')
             return render_template("add_opinion.html", form=form)
-        opinion=Opinion(
+        opinion = Opinion(
             title=form.title.data,
             text=text,
             source=form.source.data
