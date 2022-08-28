@@ -21,3 +21,9 @@ class Opinion(db.Model):
             added_by = self.added_by
         )
         return value
+
+    def from_dict(self, data):
+        fields = ("title", "text", "source", "added_by")
+        for field in fields:
+            if field in data:
+                setattr(self, field, data[field])

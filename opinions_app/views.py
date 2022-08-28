@@ -4,16 +4,21 @@ from flask import render_template, url_for
 
 from . import app, db
 from .models import Opinion
-from .forms import FlaskForm
+from .forms import OpinionForm
 
+
+def get_random_opinion():
+    quantity: int = Opinion.query.count()
+    if quantity:
+        ofsset_value = randrange(quantity)
+        opinion = Opinion.query.offset(ofsset_value).first()
+        return opinion
 
 @app.route('/')
 def index_view():
-    quantity: int = Opinion.query.count()
-    if not quantity:
+    opinion = get_random_opinion()
+    if not opinion:
         abort(404)
-    ofsset_value = randrange(quantity)
-    opinion = Opinion.query.offset(ofsset_value).first()
     context = {
         "opinion": opinion,
 
